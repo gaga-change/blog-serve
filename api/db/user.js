@@ -6,16 +6,13 @@ const only = require('only')
  */
 exports.login = function (req, res) {
   const user = only(req.body, 'username password')
-  User.findOne({$or: [{username: user.username}, {email: user.username}]}, function (err, findUser) {
+  User.findOne({username: user.username}, function (err, findUser) {
     if (err) {
       res.send({success: false, message: err.toString()})
-    } else if (!findUser) {
-      res.send({success: false, message: '用户名或邮箱不存在'})
-    } else if (!findUser.authenticate(user.password)) {
-      res.send({success: false, message: '密码错误'})
+    } else if (!findUser || !findUser.authenticate(user.password)) {
+      res.send({success: false, message: '用户名或密码错误'})
     } else {
       req.session.userId = findUser._id
-      req.session.modifyNum = findUser.modifyNum
       res.send({success: true, message: '登入成功', user: only(findUser, '-hashed_password -salt')})
     }
   })
@@ -46,11 +43,10 @@ exports.getAccount = function (req, res) {
  * 注册
  */
 exports.register = function (req, res) {
-  const user = only(req.body, 'username password email')
+  const user = only(req.body, 'username password')
   User.register(user, function (err, user) {
     if (err) return res.send({success: false, message: err.toString()})
     req.session.userId = user._id
-    req.session.modifyNum = user.modifyNum
     res.send({success: true})
   })
 }
@@ -60,11 +56,10 @@ exports.register = function (req, res) {
  */
 exports.session = function (req, res, next) {
   const userId = req.session.userId
-  const modifyNum = req.session.modifyNum
   if (!userId) return next()
   User.findById(userId, function (err, user) {
     if (err) return res.send({success: false, message: err.toString()})
-    if (user && user.modifyNum === modifyNum) {
+    if (user) {
       req.user = user
     }
     next()

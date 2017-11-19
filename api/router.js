@@ -4,6 +4,10 @@
 const user = require('./db/user.js')
 
 module.exports = function (app, router) {
+  app.use(function (req, res, next) {
+    console.log(req.path)
+    next()
+  })
   /* 中间件 */
   router.use('/', user.session) // 获取session存储的用户
 
