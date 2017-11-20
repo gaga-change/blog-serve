@@ -83,7 +83,7 @@ exports.search = function (req, res) {
       article.clickNum = article.clickNum + 1
       article.save(function (err) {
         if (err) res.send({err})
-        else res.send({article})
+        else res.send({item: article})
       })
     } else {
       Article.count(options.criteria, function (err, count) {
@@ -96,6 +96,8 @@ exports.search = function (req, res) {
         })
       })
     }
+  }).catch(err => {
+    res.send({err})
   })
 }
 
