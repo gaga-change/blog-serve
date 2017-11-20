@@ -65,7 +65,7 @@ exports.search = function (req, res) {
   // 筛选
   options.criteria = {}
   // 排序
-  options.sort = {createDate: -1} // 默认根据时间排序
+  options.sort = {createdAt: -1} // 默认根据时间排序
   if (_id) options.criteria._id = _id
   if (title) options.criteria.title = new RegExp('(' + title + ')', 'i')
   if (push) options.criteria.push = push
@@ -89,7 +89,7 @@ exports.search = function (req, res) {
       Article.count(options.criteria, function (err, count) {
         if (err) res.send({err})
         else res.send({
-          articles: articles,
+          list: articles,
           page: page + 1,
           count: count,
           pages: Math.ceil(count / limit)

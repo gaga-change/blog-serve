@@ -46,7 +46,6 @@ ArticleSchema.statics = {
     const limit = options.limit || 30
     if (criteria._id) {
       return this.find(criteria)
-        .sort({createdAt: -1})
         .limit(limit)
         .skip(limit * page)
         .exec()
