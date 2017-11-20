@@ -23,6 +23,7 @@ module.exports = function (app, router) {
   router.delete('/article', article.delete)
   router.put('/article', article.modify)
   router.get('/article', article.search)
+  router.get('/article/class', article.searchTagNum)
 
   // 配置接口前缀
   app.use('/api', router)

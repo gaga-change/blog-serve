@@ -9,9 +9,9 @@ const assign = Object.assign
 exports.add = function (req, res) {
   const article = new Article(only(req.body, 'title intro imageUrl content push'))
   if (req.body.tags) article.tags = req.body.tags.split(',')
-  article.save(function (err) {
+  article.save(function (err, article) {
     if (err) res.send({err})
-    else res.send({})
+    else res.send({article})
   })
 }
 
@@ -21,9 +21,9 @@ exports.add = function (req, res) {
 
 exports.delete = function (req, res) {
   const params = only(req.body, 'id')
-  Article.remove({_id: params.id}, function (err) {
+  Article.remove({_id: params.id}, function (err, msg) {
     if (err) res.send({err})
-    else res.send({})
+    else res.send({msg})
   })
 }
 
@@ -33,11 +33,11 @@ exports.delete = function (req, res) {
 
 exports.modify = function (req, res) {
   const params = only(req.body, 'title intro imageUrl content push tags')
-  if(params.tags) params.tags = params.tags.split(',')
+  if (params.tags) params.tags = params.tags.split(',')
   const id = req.body.id
-  Article.update({_id: id}, params, function (err) {
+  Article.update({_id: id}, params, function (err, msg) {
     if (err) res.send({err})
-    else res.send({})
+    else res.send({msg})
   })
 }
 
@@ -94,5 +94,22 @@ exports.search = function (req, res) {
         })
       })
     }
+  })
+}
+
+/**
+ * 高级查询 每个标签下文章的数量
+ */
+exports.searchTagNum = function (req, res) {
+  Article.aggregate(
+    [
+      {
+        $unwind: {path: "$tags"}
+      },
+      {
+        $group: {_id: "$tags", count: {$sum: 1}}
+      }
+    ]).exec(function (err, msg) {
+    res.send({err, msg})
   })
 }
