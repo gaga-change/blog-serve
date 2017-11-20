@@ -49,13 +49,14 @@ exports.modify = function (req, res) {
  */
 
 exports.search = function (req, res) {
-  const params = only(req.query, 'id page limit push hot title')
+  const params = only(req.query, 'id page limit push hot title tag')
   const page = (params.page > 0 ? params.page : 1) - 1
   const limit = Number(params.limit)
   const _id = params.id
   const title = params.title
   const push = params.push
   const hot = params.hot
+  const tag = params.tag
 
   const options = {
     limit: limit,
@@ -68,6 +69,7 @@ exports.search = function (req, res) {
   if (_id) options.criteria._id = _id
   if (title) options.criteria.title = new RegExp('(' + title + ')', 'i')
   if (push) options.criteria.push = push
+  if (tag) options.criteria.tags = tag
   if (hot) {
     if (Number(hot) === -1)
       options.sort = {clickNum: -1}
