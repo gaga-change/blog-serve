@@ -62,7 +62,7 @@ exports.clear = async(function* (req, res, next) {
 exports.pushCommit = async(function* (req, res, next) {
   try {
     const commitApiData = yield myRequest({ // GitHub API 请求
-      url: 'https://api.github.com/repos/gaga-change/test/commits?page=1&per_page=1',
+      url: `https://api.github.com/repos/gaga-change/${config.repo}/commits?page=1&per_page=1`,
       headers: Headers
     })
     if (commitApiData.err) { // 请求报错
