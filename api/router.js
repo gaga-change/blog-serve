@@ -8,7 +8,7 @@ const other = require('./db/other.js')
 
 module.exports = function (app, router) {
   app.use(function (req, res, next) {
-    console.log(req.path)
+    console.log(req.path + '\n')
     next()
   })
   /* 中间件 */

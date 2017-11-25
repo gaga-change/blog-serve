@@ -16,7 +16,6 @@ exports.getAbout = async(function* (req, res, next) {
       res.send({err: !about, about})
     } else {
       const about = yield Other.findOne({type: 'about'}).select('person about')
-      console.log(about)
       res.send({err: !about, about})
     }
   } catch (err) {

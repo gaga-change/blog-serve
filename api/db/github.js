@@ -37,9 +37,8 @@ exports.variable = async(function* (req, res, next) {
     } else {
       res.send({variable: already})
     }
-  }
-  catch (err) {
-    console.error('DB异常', err)
+  } catch (err) {
+    next(err)
   }
 })
 
@@ -140,9 +139,7 @@ exports.pushFile = async(function* (req, res, next) {
       return res.send({already: true, variable})
     }
     const file = files.pop()
-    console.log(file)
     const already = yield GitHubFile.findOne({sha: file.sha}) // 查看是否已存在该目录
-    console.log(already)
     if (already) {
       yield variable.save()
       return res.send({already: true, variable, file: already}) // 如果已拉取过，直接结束  end
@@ -161,7 +158,6 @@ exports.pushFile = async(function* (req, res, next) {
       fileContent.path = file.path
       yield new GitHubFile(fileContent).save()
       let blog = parseBlog(fileContent.content)
-      console.log(blog)
       if (!blog.err) yield Article.update({blog: blog.blog}, blog, {upsert: true})
       yield variable.save()
       res.send({already: false, time: fileApiData.date, variable, file, blog})

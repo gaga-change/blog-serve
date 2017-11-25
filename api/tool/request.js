@@ -6,13 +6,11 @@ const {URL} = require('url')
 
 module.exports = function (options) {
   return new Promise((resolve, reject) => {
-    console.log('sending')
     let ret = {
       data: ''
     }
     let destroy = false // 是否因超时关闭导致的 error
     let t = Date.now()
-    console.log('t', t)
     let key = null
     let req = https.request({
       hostname: new URL(options.url).hostname,
@@ -31,12 +29,9 @@ module.exports = function (options) {
         resolve(ret)
       })
     })
-    console.log('计时开始')
     key = setTimeout(() => {
-      console.log('5秒时间到计时到')
       req.destroy()
       destroy = true
-      console.log('超时', Date.now() - t, Date.now(), t)
     }, 5000)
     req.on('error', (e) => {
       if (destroy) {
