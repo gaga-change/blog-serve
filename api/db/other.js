@@ -9,7 +9,7 @@ const only = require('only')
  * @type {Function}
  */
 exports.getAbout = async(function* (req, res, next) {
-  const params = only(req.body, 'person')
+  const params = only(req.query, 'person')
   try {
     if(params.person) {
       const about = yield Other.findOne({type: 'about'}).select('person')

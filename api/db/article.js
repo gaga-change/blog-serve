@@ -80,6 +80,7 @@ exports.search = function (req, res) {
   Article.list(options).then((articles) => {
     if (_id) { // 如果是查询某一个文章，则直接访问量添 1
       let article = articles[0]
+      if (!article) return res.send({item: null})
       article.clickNum = article.clickNum + 1
       article.save(function (err) {
         if (err) res.send({err})
