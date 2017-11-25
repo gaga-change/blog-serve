@@ -11,29 +11,40 @@ const parseReadme = require('../tool/parseReadme')
 const config = require('../../hide.config.json')
 const co = require('co')
 const async = co.wrap
+const only = require('only')
 
 const Headers = {
   'User-Agent': 'gaga-change',
   'Authorization': 'token ' + config.github_token
 }
 
-// 判断全局变量是否创建
-co(function * () {
+/**
+ * 变量操控
+ * 无参 获取变量
+ * init:true 初始化变量
+ */
+exports.variable = async(function* (req, res, next) {
+  const params = only(req.body, 'init')
   try {
-    const glb = yield Variable.findOne({})
-    if (!glb) {
-      yield new Variable({}).save()
-      console.log('初始化变量 创建')
-    } else {
-      console.log('DB全局变量 已创建')
+    let already = yield Variable.findOne({})
+    if (already && params.init) { // 存在且需要初始化
+      yield already.remove()
+      already = null
     }
-  } catch (err) {
+    if (!already) {
+      const v = yield new Variable({}).save()
+      res.send({variable: v})
+    } else {
+      res.send({variable: already})
+    }
+  }
+  catch (err) {
     console.error('DB异常', err)
   }
 })
 
 // 存储Commit
-exports.pushCommit = async(function * (req, res, next) {
+exports.pushCommit = async(function* (req, res, next) {
   try {
     const commitApiData = yield myRequest({ // GitHub API 请求
       url: 'https://api.github.com/repos/gaga-change/test/commits?page=1&per_page=1',
@@ -67,7 +78,7 @@ exports.pushCommit = async(function * (req, res, next) {
  *    - Pop trees -> API 获取当前目录内容 -> 存储目录、子目录、子文件
  *  -> 返回 当前目录,未排查目录
  */
-exports.pushTree = async(function * (req, res, next) {
+exports.pushTree = async(function* (req, res, next) {
   try {
     const variable = yield Variable.findOne({})
     const trees = variable.trees
@@ -105,14 +116,8 @@ exports.pushTree = async(function * (req, res, next) {
   }
 })
 
-// 测试接口
-exports.test = async(function * (req, res, next) {
-  const already = yield GitHubFile.find({sha: req.body.sha})
-  res.send({already})
-})
-
 // 保存文件
-exports.pushFile = async(function * (req, res, next) {
+exports.pushFile = async(function* (req, res, next) {
   try {
     const variable = yield Variable.findOne({}).sort({date: -1})
     const files = variable.files
@@ -152,7 +157,7 @@ exports.pushFile = async(function * (req, res, next) {
 })
 
 // 拉取“关于我”
-exports.parseReadme = async(function * (req, res, next) {
+exports.parseReadme = async(function* (req, res, next) {
   try {
     const commit = yield GitHubCommit.findOne().sort({date: -1})
     if (!commit) return res.send({err: true, msg: '无提交日志'}) // 如果没有日志，直接结束 end
@@ -165,14 +170,14 @@ exports.parseReadme = async(function * (req, res, next) {
     const parse = parseReadme(readme.content)
     if (parse.err) return res.send({err: parse.err, msg: '解析失败'})
     parse.type = 'about'
-    let about = yield new Other(parse).save()
+    let about = yield Other.update({type: 'about'}, parse, {upsert: true})
     res.send({about})
   } catch (err) {
     next(err)
   }
 })
 
-function _parse (str) {
+function _parse(str) {
   try {
     const item = JSON.parse(str)
     if (typeof item === 'object') {
