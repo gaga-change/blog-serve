@@ -9,6 +9,8 @@ const cookieParser = require('cookie-parser')
 const mongoose = require('mongoose')
 const MongoStore = require('connect-mongo')(session)
 const router = require('express').Router()
+const config = require('./hide.config.json')
+const mongodbUrl = config && config.url ? config.url : 'mongodb://localhost/blog'
 
 mongoose.Promise = global.Promise
 let app = express()
@@ -28,25 +30,24 @@ app.use(session({
     host: 'localhost',
     port: 27017,
     db: 'session',
-    url: 'mongodb://localhost:27017/blog'
+    url: mongodbUrl
   })
 }))
 
 require('./api/router.js')(app, router) // 所有api请求
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 })
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.send({err});
 })
 
-mongoose.connect('mongodb://localhost/blog', {useMongoClient: true}).then(function () {
+mongoose.connect(mongodbUrl, {useMongoClient: true}).then(function () {
   app.listen(8080)
-  console.log(`http://localhost:8080`)
 })
