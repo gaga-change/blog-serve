@@ -39,8 +39,13 @@ module.exports = function (options) {
       console.log('超时', Date.now() - t, Date.now(), t)
     }, 5000)
     req.on('error', (e) => {
-      if (destroy) ret.err = '请求超时'
-      else ret.err = e
+      if (destroy) {
+        ret.err = '请求超时'
+        ret.msg = '请求超时'
+      } else {
+        ret.err = e
+        ret.msg = e.message
+      }
       ret.date = Date.now() - t
       resolve(ret)
     })

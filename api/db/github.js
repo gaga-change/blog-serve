@@ -66,18 +66,18 @@ exports.pushCommit = async(function* (req, res, next) {
       headers: Headers
     })
     if (commitApiData.err) { // 请求报错
-      res.send({err: commitApiData.err, time: commitApiData.date})
+      res.send({err: commitApiData.err, msg: commitApiData.msg, time: commitApiData.date})
     } else if (_parse(commitApiData.data).err) { // 解析报错
       res.send({err: _parse(commitApiData.data).err, msg: _parse(commitApiData.data).msg})
     } else {
       const commit = new GitHubCommit(_parse(commitApiData.data).obj[0])
       const already = yield GitHubCommit.findOne({sha: commit.sha})
       if (already) { // 如果已经存在
-        res.send({already: true, time: commitApiData.date, commit})
+        res.send({already: true, time: commitApiData.date, commit, headers: commitApiData.headers})
       } else {
         commit.date = commit.commit.committer.date
         yield commit.save()
-        res.send({already: false, time: commitApiData.date})
+        res.send({already: false, time: commitApiData.date, headers: commitApiData.headers})
       }
     }
   } catch (err) {
@@ -114,7 +114,7 @@ exports.pushTree = async(function* (req, res, next) {
     })
     if (treeApiData.err) { // 请求报错
       trees.push(tree) // 没有成功，填回去
-      res.send({err: treeApiData.err, time: treeApiData.date})
+      res.send({err: treeApiData.err, msg: treeApiData.msg, time: treeApiData.date})
     } else if (_parse(treeApiData.data).err) { // 解析报错
       res.send({err: _parse(treeApiData.data).err, msg: _parse(treeApiData.data).msg})
     } else { // 数据正常
@@ -153,7 +153,7 @@ exports.pushFile = async(function* (req, res, next) {
     })
     if (fileApiData.err) { // 请求报错
       files.push(file) // 填回
-      res.send({err: fileApiData.err, time: fileApiData.date})
+      res.send({err: fileApiData.err, msg: fileApiData.msg, time: fileApiData.date})
     } else if (_parse(fileApiData.data).err) { // 解析报错
       res.send({err: _parse(fileApiData.data).err, msg: _parse(fileApiData.data).msg})
     } else {
@@ -164,7 +164,7 @@ exports.pushFile = async(function* (req, res, next) {
       console.log(blog)
       if (!blog.err) yield Article.update({blog: blog.blog}, blog, {upsert: true})
       yield variable.save()
-      res.send({already: false, time: fileApiData.date, variable, fileContent, blog})
+      res.send({already: false, time: fileApiData.date, variable, file, blog})
     }
   } catch (err) {
     next(err)

@@ -34,11 +34,6 @@ app.use(session({
 
 require('./api/router.js')(app, router) // 所有api请求
 
-/* 接收所有请求 */
-// app.get('*', function (req, res) {
-//   res.sendStatus(404)
-// })
-
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
