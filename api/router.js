@@ -4,6 +4,7 @@
 const user = require('./db/user.js')
 const article = require('./db/article.js')
 const github = require('./db/github.js')
+const other = require('./db/other.js')
 
 module.exports = function (app, router) {
   app.use(function (req, res, next) {
@@ -33,6 +34,9 @@ module.exports = function (app, router) {
   router.post('/github/push/readme', github.parseReadme) // 拉取"关于我"
   router.post('/github/variable', github.variable) // 变量获取
   router.post('/github/clear', github.clear) // 清空同步内容
+
+  // About
+  router.get('/getAbout', other.getAbout)
 
   // 配置接口前缀
   app.use('/api', router)
