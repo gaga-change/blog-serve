@@ -9,9 +9,9 @@ const assign = Object.assign
 exports.add = function (req, res) {
   const article = new Article(only(req.body, 'title intro imageUrl content push'))
   if (req.body.tags) article.tags = req.body.tags.split(',')
-  article.save(function (err) {
+  article.save(function (err, article) {
     if (err) res.send({err})
-    else res.send({})
+    else res.send({article})
   })
 }
 
@@ -21,9 +21,9 @@ exports.add = function (req, res) {
 
 exports.delete = function (req, res) {
   const params = only(req.body, 'id')
-  Article.remove({_id: params.id}, function (err) {
+  Article.remove({_id: params.id}, function (err, msg) {
     if (err) res.send({err})
-    else res.send({})
+    else res.send({msg})
   })
 }
 
@@ -33,11 +33,11 @@ exports.delete = function (req, res) {
 
 exports.modify = function (req, res) {
   const params = only(req.body, 'title intro imageUrl content push tags')
-  if(params.tags) params.tags = params.tags.split(',')
+  if (params.tags) params.tags = params.tags.split(',')
   const id = req.body.id
-  Article.update({_id: id}, params, function (err) {
+  Article.update({_id: id}, params, function (err, msg) {
     if (err) res.send({err})
-    else res.send({})
+    else res.send({msg})
   })
 }
 
@@ -49,13 +49,14 @@ exports.modify = function (req, res) {
  */
 
 exports.search = function (req, res) {
-  const params = only(req.query, 'id page limit push hot title')
+  const params = only(req.query, 'id page limit push hot title tag')
   const page = (params.page > 0 ? params.page : 1) - 1
   const limit = Number(params.limit)
   const _id = params.id
   const title = params.title
   const push = params.push
   const hot = params.hot
+  const tag = params.tag
 
   const options = {
     limit: limit,
@@ -64,10 +65,11 @@ exports.search = function (req, res) {
   // 筛选
   options.criteria = {}
   // 排序
-  options.sort = {createDate: -1} // 默认根据时间排序
+  options.sort = {createdAt: -1} // 默认根据时间排序
   if (_id) options.criteria._id = _id
   if (title) options.criteria.title = new RegExp('(' + title + ')', 'i')
   if (push) options.criteria.push = push
+  if (tag) options.criteria.tags = tag
   if (hot) {
     if (Number(hot) === -1)
       options.sort = {clickNum: -1}
@@ -81,18 +83,37 @@ exports.search = function (req, res) {
       article.clickNum = article.clickNum + 1
       article.save(function (err) {
         if (err) res.send({err})
-        else res.send({article})
+        else res.send({item: article})
       })
     } else {
       Article.count(options.criteria, function (err, count) {
         if (err) res.send({err})
         else res.send({
-          articles: articles,
+          list: articles,
           page: page + 1,
           count: count,
           pages: Math.ceil(count / limit)
         })
       })
     }
+  }).catch(err => {
+    res.send({err})
+  })
+}
+
+/**
+ * 高级查询 每个标签下文章的数量
+ */
+exports.searchTagNum = function (req, res) {
+  Article.aggregate(
+    [
+      {
+        $unwind: {path: "$tags"}
+      },
+      {
+        $group: {_id: "$tags", count: {$sum: 1}}
+      }
+    ]).exec(function (err, msg) {
+    res.send({err, msg})
   })
 }
