@@ -3,6 +3,7 @@
  */
 const user = require('./db/user.js')
 const article = require('./db/article.js')
+const github = require('./db/github.js')
 
 module.exports = function (app, router) {
   app.use(function (req, res, next) {
@@ -24,6 +25,17 @@ module.exports = function (app, router) {
   router.put('/article', article.modify)
   router.get('/article', article.search)
 
+  // GitHub Api
+  router.post('/github/push/commit', github.pushCommit) // 拉取最新commit
+  router.post('/github/push/tree', github.pushTree) // 拉取最新commit
+  router.post('/github/push/file', github.pushFile) // 拉取文件内容
+  router.post('/github/push/readme', github.parseReadme) // 拉取"关于我"
+
+
+  // 错误捕获
+  router.use('*', function (err, req, res) {
+    res.send({err: err})
+  })
   // 配置接口前缀
   app.use('/api', router)
 }

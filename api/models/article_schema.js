@@ -5,14 +5,16 @@ const Schema = mongoose.Schema
  * Article Schema
  */
 const ArticleSchema = new Schema({
-  title: {type: String, default: '', trim: true}, // 标题
-  intro: {type: String, default: '', trim: true}, // 简介
+  blog: {type: String, default: ''}, // 博客唯一id
+  title: {type: String, default: ''}, // 标题
+  intro: {type: String, default: ''}, // 简介
   imageUrl: {type: String, default: ''}, // 图片路径
-  content: {type: String, default: '', trim: true}, // 内容
+  content: {type: String, default: ''}, // 内容
   push: {type: Boolean, default: false}, // 是否放入推荐列表
   tags: {type: Array, default: []}, // 标签
   clickNum: {type: Number, default: 0}, // 阅读量
   commentNum: {type: Number, default: 0}, // 评论数
+  date: {type: Date, default: Date.now()} // 界面显示的创建时间
 }, {timestamps: {createdAt: true, updateAt: true}})
 
 /**
