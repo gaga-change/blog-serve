@@ -33,7 +33,11 @@ module.exports = function parseBlog (data) {
     let body = arr.join('') // 内容
     ret.imageUrl = body.split('[image]:')[1].trim()
     ret.intro = body.split('\n')[2].split('>')[1].trim()
-    ret.content = data
+    body = body.split('\n')
+    body.shift()
+    body.shift()
+    body.shift()
+    ret.content = body.join('\n')
     return ret
   } catch (err) {
     return {err}
