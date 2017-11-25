@@ -43,6 +43,21 @@ exports.variable = async(function* (req, res, next) {
   }
 })
 
+// 清空同步内容
+exports.clear = async(function* (req, res, next) {
+  try {
+    yield GitHubCommit.remove({})
+    yield GitHubTree.remove({})
+    yield GitHubFile.remove({})
+    yield Variable.remove({})
+    yield new Variable({}).save()
+    res.send({msg: 'success'})
+  } catch (err) {
+    next(err)
+  }
+})
+
+
 // 存储Commit
 exports.pushCommit = async(function* (req, res, next) {
   try {

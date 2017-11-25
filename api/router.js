@@ -32,11 +32,8 @@ module.exports = function (app, router) {
   router.post('/github/push/file', github.pushFile) // 拉取文件内容
   router.post('/github/push/readme', github.parseReadme) // 拉取"关于我"
   router.post('/github/variable', github.variable) // 变量获取
+  router.post('/github/clear', github.clear) // 清空同步内容
 
-  // 错误捕获
-  router.use('*', function (err, req, res) {
-    res.send({err: err})
-  })
   // 配置接口前缀
   app.use('/api', router)
 }
