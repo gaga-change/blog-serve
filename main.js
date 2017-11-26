@@ -11,7 +11,6 @@ const MongoStore = require('connect-mongo')(session)
 const router = require('express').Router()
 const config = require('./hide.config.json')
 const mongodbUrl = config && config.url ? config.url : 'mongodb://localhost/blog'
-
 mongoose.Promise = global.Promise
 let app = express()
 
@@ -49,5 +48,7 @@ app.use(function (err, req, res, next) {
 })
 
 mongoose.connect(mongodbUrl, {useMongoClient: true}).then(function () {
-  app.listen(8080)
+  app.listen(8080, () => {
+    console.log('localhost:8080')
+  })
 })
