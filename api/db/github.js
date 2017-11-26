@@ -94,7 +94,8 @@ exports.pushCommit = async(function* (req, res, next) {
  */
 exports.pushTree = async(function* (req, res, next) {
   try {
-    const variable = yield Variable.findOne({})
+    let variable = yield Variable.findOne({})
+    if (!variable) variable = yield new Variable({}).save()
     const trees = variable.trees
     if (trees.length === 0) {
       const commit = yield GitHubCommit.findOne().sort({date: -1})
