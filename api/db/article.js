@@ -109,7 +109,8 @@ exports.searchTagNum = function (req, res) {
   Article.aggregate(
     [
       {
-        $unwind: {path: "$tags"}
+        // $unwind: {path: "$tags"}
+        $unwind: "$tags"
       },
       {
         $group: {_id: "$tags", count: {$sum: 1}}
