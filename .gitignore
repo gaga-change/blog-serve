@@ -2,3 +2,4 @@
 node_modules
 test*
 hide.config.json
+package-lock.json
