@@ -8,3 +8,6 @@ mongodb数据库连接host
 
 启动端口
 - PORT
+
+博客存储的仓库名
+- GITHUB_REPO
