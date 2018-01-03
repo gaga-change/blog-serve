@@ -10,6 +10,7 @@ const mongoose = require('mongoose')
 const MongoStore = require('connect-mongo')(session)
 const router = require('express').Router()
 const config = require('./config.js')
+console.log('config:', config)
 const mongodbUrl = config.url
 mongoose.Promise = global.Promise
 let app = express()
