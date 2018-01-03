@@ -10,7 +10,7 @@ const mongoose = require('mongoose')
 const MongoStore = require('connect-mongo')(session)
 const router = require('express').Router()
 const config = require('./config.js')
-const mongodbUrl = config && config.url ? config.url : 'mongodb://localhost/blog'
+const mongodbUrl = config.url
 mongoose.Promise = global.Promise
 let app = express()
 
@@ -26,8 +26,6 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   store: new MongoStore({
-    host: 'localhost',
-    port: 27017,
     db: 'session',
     url: mongodbUrl
   })
