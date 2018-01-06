@@ -40,7 +40,8 @@ module.exports = function (app, router) {
   router.get('/getAbout', other.getAbout)
 
   // 配置接口前缀
-  app.use('/api', router)
+  // app.use('/api', router)
+  app.use(router)
 }
 
 
