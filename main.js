@@ -17,13 +17,20 @@ let app = express()
 
 app.use(bodyParser.json()) // for parsing application/json
 app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+let cookieSet = { 
+  secure: false, 
+  maxAge: 24 * 60 * 60 * 1000
+}
+if (config.domain) {
+  cookieSet.domain = config.domain
+}
 /* cookie解析 */
 app.use(cookieParser())
 /* 配置session插件 */
 app.use(session({
   secret: '123456',
   name: 'sessionId', // cookie中的键名，用于存储sessionId
-  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }, // cookie保存的时间
+  cookie: cookieSet, // cookie保存的时间
   resave: false,
   saveUninitialized: true,
   store: new MongoStore({
